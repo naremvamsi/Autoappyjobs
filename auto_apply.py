@@ -68,7 +68,7 @@ def try_fill_field(page, value):
 def fill_common_fields(page, body_text):
     body_lower = (body_text or "").lower()
 
-    for keyword in ["sre", "devops", "azure", "kubernetes", "terraform", "total", "current ctc", "expected ctc", "notice"]:
+    for keyword in ["sre", "devops", "azure", "kubernetes", "Azure Devops" , "terraform", "total", "current ctc", "expected ctc", "notice"]:
         if keyword in body_lower:
             answer = ANSWERS.get(keyword)
             if answer and try_fill_field(page, answer):
