@@ -1,11 +1,17 @@
-from playwright.sync_api import sync_playwright
+import os
 import time
+
+from playwright.sync_api import sync_playwright
 
 from config import ANSWERS
 
 SEARCH_URL = "https://www.naukri.com/devops-engineer-azure-devops-engineer-site-reliability-engineer-azure-cloud-jobs?k=devops%20engineer%2C%20azure%20devops%20engineer%2C%20site%20reliability%20engineer%2C%20azure%20cloud&nignbevent_src=jobsearchDeskGNB"
 APPLIED_FILE = "applied_jobs.txt"
 EXTERNAL_SITES = ["workday", "oracle", "greenhouse", "lever", "successfactors"]
+
+
+def should_launch_headless():
+    return os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def load_applied():
@@ -190,7 +196,9 @@ def main():
     applied_jobs = load_applied()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=1000)
+        headless = should_launch_headless()
+        launch_args = ["--no-sandbox"] if headless else []
+        browser = p.chromium.launch(headless=headless, args=launch_args, slow_mo=1000 if not headless else 0)
         context = browser.new_context(storage_state="state.json")
         page = context.new_page()
 
