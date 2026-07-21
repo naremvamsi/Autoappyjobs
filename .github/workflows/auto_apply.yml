@@ -1,5 +1,8 @@
 name: Auto Apply Jobs
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # Runs at 02:00 and 14:00 UTC every day — adjust as needed
