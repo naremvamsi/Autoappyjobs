@@ -5,9 +5,8 @@ permissions:
 
 on:
   schedule:
-    # Runs at 02:00 and 14:00 UTC every day — adjust as needed
-    - cron: '0 2,14 * * *'
-  workflow_dispatch: {}
+    # Runs at 00:00, 08:00, and 16:00 IST every day
+    - cron: '30 18,2,10 * * *'
 
 jobs:
   run-auto-apply:
