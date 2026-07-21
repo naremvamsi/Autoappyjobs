@@ -23,7 +23,7 @@ jobs:
           echo "${{ secrets.STATE_JSON_B64 }}" | base64 -d > state.json
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: '3.11'
 
