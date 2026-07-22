@@ -1,5 +1,8 @@
 import os
+import re
 import time
+from html import unescape
+from urllib.parse import urljoin
 
 from playwright.sync_api import sync_playwright
 
@@ -20,6 +23,29 @@ def load_applied():
             return set(line.strip() for line in f)
     except Exception:
         return set()
+
+
+def extract_job_links_from_html(html_text):
+    if not html_text:
+        return []
+
+    links = []
+    seen = set()
+    for match in re.finditer(r'https?://[^\s"\']+|/job-listings[^\s"\']*', html_text, re.IGNORECASE):
+        href = match.group(0)
+        normalized = unescape(href).strip()
+        if not normalized:
+            continue
+        if normalized.startswith("/"):
+            normalized = urljoin("https://www.naukri.com", normalized)
+        if "job-listings" not in normalized.lower():
+            continue
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        links.append(normalized)
+
+    return links
 
 
 def save_applied(url):
@@ -248,14 +274,17 @@ def main():
         except Exception:
             print("Could not apply Last 10 Days filter")
 
-        links = []
-        for a in page.locator("a").all():
-            try:
-                href = a.get_attribute("href")
-                if href and "job-listings" in href:
-                    links.append(href)
-            except Exception:
-                pass
+        page_html = page.content()
+        links = extract_job_links_from_html(page_html)
+
+        if not links:
+            for a in page.locator("a").all():
+                try:
+                    href = a.get_attribute("href")
+                    if href and "job-listings" in href:
+                        links.append(href)
+                except Exception:
+                    pass
 
         links = list(dict.fromkeys(links))
         print(f"Found {len(links)} jobs")
